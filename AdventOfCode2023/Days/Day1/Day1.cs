@@ -1,4 +1,6 @@
 ﻿
+using AdventOfCode2023.Models;
+using AdventOfCode2023.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,96 +18,60 @@ namespace AdventOfCode2023.Days.Day1
         // RIGHT  ANSWER : 54605
         public void Answer(string FilePath)
         {
-            ICollection<string> Lines = ReadFileContent(FilePath);
-
+            FileOperations FileOperations = new FileOperations();
+            LinesCheckerModule LinesCheckerModule = new LinesCheckerModule();
+            ICollection<string> Lines = FileOperations.ReadFileContent(FilePath);
+            
             ICollection<int> NumbersToSum = new List<int>();
+            int Sumator=0;
             foreach (var Line in Lines)
             {
+                int FoundNumber = LinesCheckerModule.FindNumberFromLine(Line, (int)Flags.includeDigits);
                 
-                NumbersToSum.Add(FindNumber(Line));
+                NumbersToSum.Add(FoundNumber);
+                Sumator += FoundNumber;
+             
             }
-            Console.WriteLine($"ANSWER: {NumbersToSum.Sum()}");
+            
+           // PrintNumbersInRows(NumbersToSum.ToList(), 20);
+            Console.WriteLine($"DAY 1  ANSWER: {NumbersToSum.Sum()}");
         }
 
-        public ICollection<string>  ReadFileContent(string filePath)
+        static void PrintNumbersInRows(List<int> numbers, int numbersPerRow)
         {
-            // Check if the file exists
-            if (!File.Exists(filePath))
+            for (int i = 0; i < numbers.Count; i++)
             {
-                throw new FileNotFoundException("The specified file does not exist.", filePath);
-            }
+                Console.Write($"{i + 1,2}:  "); 
+                Console.Write("{ " +numbers[i] + " }");
 
-            // Read the content of the file and store it in a list of chars
-            List<int> NumbersToSum = new List<int>();
-            ICollection<string> lines = new List<string>();
-            using (StreamReader reader = new StreamReader(filePath))
-            {
-                string line;
-               do
-               {
-                    line = reader.ReadLine();
-                    if (line != null)
-                    {
-                        lines.Add(line);
-                    }
-                } while (line != null);
-            }
-            return lines;
-        }
-
-
-
-       public int FindNumber(string Line)
-       {
-          
-            ICollection<int> array = new List<int>();
-            foreach (char c in Line)
-            {
-                if (checkIfCharBetweenRange(c))
+                if ((i + 1) % numbersPerRow == 0)
                 {
-                   
-                    array.Add(convertToInt(c));
+                    Console.WriteLine(); 
                 }
-
             }
-            return DigitsToDubleDigitNumber(array);
         }
 
-        private int convertToInt(int SingleCharacter)
+        public void AnswerWithRegex(string FilePath)
         {
-            return SingleCharacter - 48;
-        }
-        private bool checkIfCharBetweenRange(char ToCheck)
-        {
-            int MinimalRange = 48;
-            int MaximalRange = 57;
-            if (ToCheck >= MinimalRange && ToCheck <= MaximalRange)
+            Console.Clear();
+
+            FileOperations FileOperations = new FileOperations();
+            ICollection<string> Lines = FileOperations.ReadFileContent(FilePath);
+            RegexCheckerModule RegexCheckerModule = new RegexCheckerModule();
+            ICollection<int> NumbersToSum = new List<int>();
+            int Sumator = 0;
+            foreach (var Line in Lines)
             {
-                return true;
+                int FoundNumber = RegexCheckerModule.FindNumberFromLine(Line, (int)Flags.includeLetters);
+                
+                NumbersToSum.Add(FoundNumber);
+                Sumator += FoundNumber;
+              
             }
-            return false;
+           // PrintNumbersInRows(NumbersToSum.ToList(), 20);
+            Console.WriteLine($"DAY 1 ANSWER WITH REGEX: {NumbersToSum.Sum()}");
+            Console.WriteLine("=====================================");
         }
-        
-
-        private int  DigitsToDubleDigitNumber(ICollection<int> array)
-        {
-            int DoubleDigitNumber;
-            if (array.Count==1)
-            {
-                DoubleDigitNumber = (MergeTwoDigits(array.ElementAt(0), array.ElementAt(0)));
-            }
-            else
-            {
-                DoubleDigitNumber=(MergeTwoDigits(array.ElementAt(0), array.ElementAt(array.Count-1)));
-            }
-            return DoubleDigitNumber;
-        }
-
-        private int MergeTwoDigits(int x, int y)
-        {
-            return x * 10 + y;
-        }
-
 
     }
 }
